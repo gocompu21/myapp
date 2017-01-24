@@ -19,3 +19,32 @@ Route::get('/', function(){
     ]);
 });
 
+
+Route::get('/welcome2', function(){
+    return view('welcome2')->with([
+        'name' => 'Foo',
+        'greeting' => '안녕하세요2? ',
+    ]);
+
+});
+
+Route::get('/welcome3', function(){
+    return view('welcome3')->with([
+        'name' => 'Foo',
+        'greeting' => '브레이드 주석처리 테스 ',
+    ]);
+
+});
+
+Route::get('/welcome4', function() {
+    $items = ['apple','banana','tomato', 'perl'];
+    return view('welcome4', ['items' => $items]);
+});
+
+Route::get('/welcome5', function()
+    {
+    return view('welcome5');
+    //return 'test';
+    });
+
+
