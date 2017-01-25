@@ -13,7 +13,11 @@ class ArticlesController extends Controller
      */
     public function index()
     {
-        return __METHOD__ . '은 Article 컬렉션을 조회합니다' ;
+//        $articles = \App\Article::with('user')->get();
+//        $articles = \App\Article::get();
+//        $articles->load('user');
+        $articles = \App\Article::latest()->paginate(2);
+        return view('articles.index', compact('articles'));
     }
 
     /**

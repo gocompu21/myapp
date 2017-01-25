@@ -39,7 +39,6 @@ Route::get('auth/logout',function (){
     return '또 봐요~';
 });
 
-Route::resource('articles','ArticlesController');
 
 Route::get('/foo', function(){
     return view('welcome1')->with([
@@ -76,8 +75,13 @@ Route::get('/welcome5', function()
     //return 'test';
     });
 
-
-
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+
+Route::resource('articles','ArticlesController');
+
+//DB::listen(
+//    function($query){
+//        var_dump($query->sql);
+//    });

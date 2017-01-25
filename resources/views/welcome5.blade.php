@@ -1,18 +1,41 @@
-@extends('layouts.master')
-
-@section('style')
-    <style>
-        body {background: green; color: white;}
-    </style>
-@endsection
-
+@extends('layouts.app')
 @section('content')
-    @include('partials.footer')
-@endsection
+<div class="container">
+<h1>포럼 글 목록</h1>
+<hr />
+<ul>
+@forelse($articles as $article)
+<li>
+{{$article->$article}}
+<small>
+by {{$article->user->name}}
+</small>
+</li>
+@empty
+<p>글이 없습니다.</p>
+@endforelse
+</ul>
+</div>
+@stop
 
-@section('script')
-    <script>
-        alert('저는 자식뷰의 \'script\' 섹션입니다. ')
-    </script>
-@endsection
 
+{{--@extends('layouts.app')--}}
+
+{{--@section('content')--}}
+{{--<div class="clntainer">--}}
+{{--<h1>포럼 글 목록</h1>--}}
+{{--<hr />--}}
+{{--<ul>--}}
+{{--@forelse($articles as $article)--}}
+{{--<li>--}}
+{{--{{$article->$article}}--}}
+{{--<small>--}}
+{{--by {{$article->user->name}}--}}
+{{--</small>--}}
+{{--</li>--}}
+{{--@empty--}}
+{{--<p>글이 없습니다.</p>--}}
+{{--@endforelse--}}
+{{--</ul>--}}
+{{--</div>--}}
+{{--@stop--}}
