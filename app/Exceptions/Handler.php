@@ -32,6 +32,7 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+
         parent::report($exception);
     }
 
@@ -44,6 +45,16 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if (app()->environment('local'))
+        {
+            if ($exception instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                return response(view('errors.notice', [
+                    'title' => '찾을 수 없습니다',
+                    'description' => '요청하신 페이지가 없습니다',
+                ]), 404);
+            }
+        }
+
         return parent::render($request, $exception);
     }
 
@@ -60,6 +71,6 @@ class Handler extends ExceptionHandler
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
-        return redirect()->guest('login');
+        return redirect()->guest(route('sessions.create'));
     }
 }

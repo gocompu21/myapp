@@ -18,6 +18,7 @@ class ArticlesController extends Controller
 //        $articles = \App\Article::get();
 //        $articles->load('user');
         $articles = \App\Article::latest()->paginate(5);
+        //dd(view('articles.index', compact('articles'))->render());
         return view('articles.index', compact('articles'));
     }
 
@@ -58,7 +59,9 @@ class ArticlesController extends Controller
      */
     public function show($id)
     {
-        return __METHOD__ . '은 Article 컬렉션을 show' ;
+        $article = \App\Article::findOrFail($id);
+        dd($article);
+        return $article->toArray();
     }
 
     /**
