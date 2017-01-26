@@ -85,3 +85,4 @@ Route::resource('articles','ArticlesController');
 //    function($query){
 //        var_dump($query->sql);
 //    });
+
