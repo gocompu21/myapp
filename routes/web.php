@@ -101,3 +101,4 @@ Route::get('mail', function(){
 });
 
 Route::get('docs/{file?}', 'DocsController@show');
+Route::get('docs/images/{image}','DocsController@image')->where('image','[\pL-\pN\._-]+-img-[0-9]{2}.png');
