@@ -7,3 +7,22 @@
 
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+
+#app-layout {
+  .docs__sidebar {
+    margin-top: 20px;
+  }
+}
+
+pre {
+  background : #222222;
+  border-radius: 0;
+}
+
+// 이하 데일 리즈의 칼라 스킴에서 복사한 스타일시트
+
+.hljs {
+  display: block; padding: 0.5em;
+  background: #222222; color: #f0f0f0;
+}
+
