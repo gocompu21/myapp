@@ -34,6 +34,12 @@ class User extends Authenticatable
 
     protected $dates = ['last_login'];
 
+
+    public function isAdmin()
+    {
+        return ($this->id === 1) ? true : false;
+    }
+
     public function articles()
     {
         return $this->hasMany(Article::class);

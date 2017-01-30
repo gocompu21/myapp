@@ -12,7 +12,7 @@
 
             <!-- Branding Image -->
             <a class="navbar-brand" href="{{ url('/') }}">
-                {{ config('app.name', 'Laravel') }}
+                {{ config('app.name', '스택 오버플로우') }}
             </a>
         </div>
 
@@ -28,6 +28,7 @@
                 @if (Auth::guest())
                     <li><a href="{{ route('sessions.create') }}">로그인</a></li>
                     <li><a href="{{ route('users.create') }}">회원가입</a></li>
+                    <li><a href="{{ route('articles.index') }}">포럼</a></li>
                 @else
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">

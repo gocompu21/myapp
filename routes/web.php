@@ -2,7 +2,7 @@
 
 Route::get('/', [
     'as' => 'root',
-    'uses' => 'WelcomeController@index',
+    'uses' => 'ArticlesController@index',
 ]);
 
 Route::get('/home', [
