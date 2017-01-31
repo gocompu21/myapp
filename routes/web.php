@@ -10,6 +10,11 @@ Route::get('/home', [
     'uses' => 'HomeController@index',
 ]);
 
+Route::get('tags/{slug}/articles', [
+    'as' => 'tags.articles.index',
+    'uses' => 'ArticlesController@index'
+]);
+
 Route::resource('articles', 'ArticlesController');
 
 /* Markdown Viewer */

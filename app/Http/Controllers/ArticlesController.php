@@ -17,12 +17,16 @@ class ArticlesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($slug = null)
     {
 //        $articles = \App\Article::with('user')->get();
 //        $articles = \App\Article::get();
 //        $articles->load('user');
-        $articles = \App\Article::latest()->paginate(5);
+        $query = $slug
+            ? \App\Tag::whereSlug($slug)->firstOrFail()->articles()
+            : new \App\Article;
+
+        $articles = $query->latest()->paginate(5);
         //dd(view('articles.index', compact('articles'))->render());
         return view('articles.index', compact('articles'));
     }
@@ -51,10 +55,13 @@ class ArticlesController extends Controller
         if(! $article){
             return back()->with('flash_message','글이 저장되지 않았습니다')->withInput();
         }
+        $article->tags()->sync($request->input('tags'));
         event(new \App\Events\ArticlesEvent($article));
 
+        flash()->success('작성하신 글이 저장되었습니다.');
+
 //        var_dump($article->toArray());
-        return redirect(route('articles.index'))->with('flash_message','작성하신 글이 저장되었습니다');
+        return redirect(route('articles.index'));
     }
 
     /**
@@ -90,9 +97,11 @@ class ArticlesController extends Controller
      */
     public function update(Request $request, \App\Article $article)
     {
+        $this->authorize('update', $article);
         $article->update($request->all());
-        flash()->success('수정하신 내용을 저장했습니다.');
+        $article->tags()->sync($request->input('tags'));
 
+        flash()->success('수정하신 내용을 저장했습니다.');
         return redirect(route('articles.show', $article->id));
     }
 
