@@ -18,4 +18,18 @@ class Article extends Model
     {
         return $this->belongsToMany(Tag::class);
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(Attachment::class);
+    }
+
+    public function getBytesAttribute($value){
+        return format_filesize($value);
+    }
+
+    public function getUrlAttribute()
+    {
+        return url('files/'.$this->filename);
+    }
 }

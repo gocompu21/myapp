@@ -16,6 +16,7 @@ Route::get('tags/{slug}/articles', [
 ]);
 
 Route::resource('articles', 'ArticlesController');
+Route::resource('attachments','AttachmentsController',['only' => ['store', 'destroy']]);
 
 /* Markdown Viewer */
 Route::get('docs/{file?}', 'DocsController@show');

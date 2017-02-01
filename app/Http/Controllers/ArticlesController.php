@@ -56,11 +56,29 @@ class ArticlesController extends Controller
             return back()->with('flash_message','글이 저장되지 않았습니다')->withInput();
         }
         $article->tags()->sync($request->input('tags'));
+
+//        if ($request->hasFile('files')) {
+//            // 파일 저장
+//            $files = $request->file('files');
+//
+//            foreach($files as $file) {
+//                $filename = str_random().filter_var($file->getClientOriginalName(), FILTER_SANITIZE_URL);
+//
+//                // 순서 중요 !!!
+//                // 파일이 PHP의 임시 저장소에 있을 때만 getSize, getClientMimeType등이 동작하므로,
+//                // 우리 프로젝트의 파일 저장소로 업로드를 옮기기 전에 필요한 값을 취해야 함.
+//                $article->attachments()->create([
+//                    'filename' => $filename,
+//                    'bytes' => $file->getSize(),
+//                    'mime' => $file->getClientMimeType()
+//                ]);
+//
+//                $file->move(attachments_path(), $filename);
+//            }
+//        }
+
         event(new \App\Events\ArticlesEvent($article));
-
         flash()->success('작성하신 글이 저장되었습니다.');
-
-//        var_dump($article->toArray());
         return redirect(route('articles.index'));
     }
 
@@ -100,7 +118,7 @@ class ArticlesController extends Controller
         $this->authorize('update', $article);
         $article->update($request->all());
         $article->tags()->sync($request->input('tags'));
-
+  //      dd($request);
         flash()->success('수정하신 내용을 저장했습니다.');
         return redirect(route('articles.show', $article->id));
     }
@@ -113,7 +131,7 @@ class ArticlesController extends Controller
      */
     public function destroy(\App\Article $article)
     {
-        $this->authorize('deletd', $article);
+        $this->authorize('delete', $article);
         $article->delete();
         return response()->json([], 204);
     }

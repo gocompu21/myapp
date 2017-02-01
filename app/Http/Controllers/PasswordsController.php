@@ -85,6 +85,10 @@ class PasswordsController extends Controller
             return $this->respondError('URL이 정확하지 않습니다.');
         }
 
+        \App\User::whereEmail($request->input('email'))->first()->update()([
+            'password' => bcrypt($request->input('password'))
+        ]);
+
         \DB::table('password_resets')->whereToken($token)->delete();
 
         return $this->respondSuccess(
