@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers\App\Events;
+namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -9,27 +9,22 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class ArticleCreated
+class ModelChanged
 {
     use InteractsWithSockets, SerializesModels;
 
     /**
-     * Create a new event instance.
-     *
-     * @return void
+     * @var string|array
      */
-    public function __construct()
-    {
-        //
-    }
+    public $cacheTags;
 
     /**
-     * Get the channels the event should broadcast on.
+     * Create a new event instance.
      *
-     * @return Channel|array
+     * @param string $cacheTags
      */
-    public function broadcastOn()
+    public function __construct($cacheTags)
     {
-        return new PrivateChannel('channel-name');
+        $this->cacheTags = $cacheTags;
     }
 }

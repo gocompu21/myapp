@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Providers\App\Events;
+namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -9,18 +9,20 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class Article
+class CommentsEvent
 {
     use InteractsWithSockets, SerializesModels;
+
+    public $comment;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(\App\Comment $comment)
     {
-        //
+        $this->comment = $comment;
     }
 
     /**

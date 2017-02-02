@@ -82,6 +82,42 @@ class DatabaseSeeder extends Seeder
         });
         $this->command->info('Seeded: attachments table and files');
 
+
+        /* 댓글 */
+        App\Comment::truncate();
+        $articles->each(function ($article) {
+            $article->comments()->save(factory(App\Comment::class)->make());
+            $article->comments()->save(factory(App\Comment::class)->make());
+        });
+
+        // 댓글의 댓글(자식 댓글)
+        $articles->each(function ($article) use ($faker){
+            $commentIds = App\Comment::pluck('id')->toArray();
+
+            foreach(range(1,5) as $index) {
+                $article->comments()->save(
+                    factory(App\Comment::class)->make([
+                        'parent_id' => $faker->randomElement($commentIds),
+                    ])
+                );
+            }
+        });
+
+        $this->command->info('Seeded: comments table');
+
+        /* up & down 투표 */
+        App\Vote::truncate();
+        $comments = App\Comment::all();
+
+        $comments->each(function ($comment) {
+            $comment->votes()->save(factory(App\Vote::class)->make());
+            $comment->votes()->save(factory(App\Vote::class)->make());
+            $comment->votes()->save(factory(App\Vote::class)->make());
+        });
+
+        $this->command->info('Seeded: votes table');
+
+
         if (! $sqlite) {
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
         }

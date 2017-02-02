@@ -24,14 +24,14 @@ class ArticlesRequest extends FormRequest
      */
     public function rules()
     {
-        $mimes = implode(',', config('project.mimes'));
+        //$mimes = implode(',', config('project.mimes'));
 
         return [
             'title' => ['required'],
             'content' => ['required','min:10'],
             'tags' => ['required','array'],
             'files' => ['array'],
-            'files.*' => ['sometimes', "mimes:{$mimes}", 'max:30000'],
+            'files.*' => ['sometimes', "mimes:'png','jpg','zip','tar',", 'max:30000'],
         ];
     }
 

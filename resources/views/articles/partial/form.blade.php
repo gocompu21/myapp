@@ -22,6 +22,15 @@
     {!! $errors->first('content', '<span class="form-error">:message</span>') !!}
 </div>
 
+<div class="form-group">
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" name="notification" value="{{ old('notification', $article->notification) }}">
+            댓글이 작성되면 이메일 알림 받기
+        </label>
+    </div>
+</div>
+
 {{--<div class="form-group {{ $errors->has('files') ? 'has-error' : '' }}">--}}
 {{--<label for="files">파일</label>--}}
 {{--<input type="file" name="files[]" id="files" class="form-control" multiple="multiple"/>--}}

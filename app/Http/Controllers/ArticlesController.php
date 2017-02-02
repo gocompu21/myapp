@@ -17,17 +17,27 @@ class ArticlesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($slug = null)
-    {
-//        $articles = \App\Article::with('user')->get();
-//        $articles = \App\Article::get();
-//        $articles->load('user');
+    public function index(Request $request, $slug = null) {
+
+        $cacheKey = cache_key('articles.index');
+
         $query = $slug
             ? \App\Tag::whereSlug($slug)->firstOrFail()->articles()
             : new \App\Article;
 
-        $articles = $query->latest()->paginate(5);
-        //dd(view('articles.index', compact('articles'))->render());
+        $query = $query->orderBy(
+            $request->input('sort', 'created_at'),
+            $request->input('order', 'desc')
+        );
+
+        if ($keyword = request()->input('q')) {
+            $raw = 'MATCH(title,content) AGAINST(? IN BOOLEAN MODE)';
+            $query = $query->whereRaw($raw, [$keyword]);
+        }
+
+//        $articles = $query->paginate(3);
+        $articles = $this->cache($cacheKey, 5, $query, 'paginate', 3);
+
         return view('articles.index', compact('articles'));
     }
 
@@ -50,35 +60,26 @@ class ArticlesController extends Controller
      */
     public function store(ArticlesRequest $request)
     {
-        //$article = \App\User::find(1)->articles()->create($request->all());
-        $article = $request->user()->articles()->create($request->all());
-        if(! $article){
-            return back()->with('flash_message','글이 저장되지 않았습니다')->withInput();
+        // 글 저장
+        $payload = array_merge($request->all(), [
+            'notification' => $request->has('notification'),
+        ]);
+
+        $article = $request->user()->articles()->create($payload);
+
+        if (! $article) {
+            flash()->error('작성하신 글을 저장하지 못했습니다.');
+            return back()->withInput();
         }
+
+        // 태그 싱크
         $article->tags()->sync($request->input('tags'));
 
-//        if ($request->hasFile('files')) {
-//            // 파일 저장
-//            $files = $request->file('files');
-//
-//            foreach($files as $file) {
-//                $filename = str_random().filter_var($file->getClientOriginalName(), FILTER_SANITIZE_URL);
-//
-//                // 순서 중요 !!!
-//                // 파일이 PHP의 임시 저장소에 있을 때만 getSize, getClientMimeType등이 동작하므로,
-//                // 우리 프로젝트의 파일 저장소로 업로드를 옮기기 전에 필요한 값을 취해야 함.
-//                $article->attachments()->create([
-//                    'filename' => $filename,
-//                    'bytes' => $file->getSize(),
-//                    'mime' => $file->getClientMimeType()
-//                ]);
-//
-//                $file->move(attachments_path(), $filename);
-//            }
-//        }
-
         event(new \App\Events\ArticlesEvent($article));
+        event(new \App\Events\ModelChanged(['articles']));
+
         flash()->success('작성하신 글이 저장되었습니다.');
+
         return redirect(route('articles.index'));
     }
 
@@ -91,7 +92,16 @@ class ArticlesController extends Controller
     public function show(\App\Article $article)
     {
 //        $article = \App\Article::findOrFail($id);
-        return view('articles.show',compact('article'));
+        $article->view_count += 1;
+        $article->save();
+
+        $comments = $article->comments()
+            ->with('replies')
+            ->withTrashed()
+            ->whereNull('parent_id')
+            ->latest()->get();
+
+        return view('articles.show',compact('article','comments'));
     }
 
     /**
@@ -118,7 +128,7 @@ class ArticlesController extends Controller
         $this->authorize('update', $article);
         $article->update($request->all());
         $article->tags()->sync($request->input('tags'));
-  //      dd($request);
+
         flash()->success('수정하신 내용을 저장했습니다.');
         return redirect(route('articles.show', $article->id));
     }

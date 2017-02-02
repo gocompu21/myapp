@@ -18,6 +18,14 @@ Route::get('tags/{slug}/articles', [
 Route::resource('articles', 'ArticlesController');
 Route::resource('attachments','AttachmentsController',['only' => ['store', 'destroy']]);
 
+Route::resource('comments','CommentsController',['only'=>['update','destroy']]);
+Route::resource('articles.comments', 'CommentsController',['only' => 'store']);
+
+Route::post('comments/{comment}/votes',[
+    'as' => 'comments.vote',
+    'uses' => 'CommentsController@vote'
+]);
+
 /* Markdown Viewer */
 Route::get('docs/{file?}', 'DocsController@show');
 Route::get('docs/images/{image}', 'DocsController@image')
