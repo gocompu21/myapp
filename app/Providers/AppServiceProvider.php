@@ -13,6 +13,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if (is_api_domain() and request()->getLanguages()) {
+            $preferred = request()->getPreferredLanguage();
+            $locale = str_contains($preferred, 'ko') ? 'ko' : 'en';
+            app()->setLocale($locale);
+        }
+
+        \Carbon\Carbon::setLocale(app()->getLocale());
+
         view()->composer('*', function ($view) {
             $allTags = \Cache::rememberForever('tags.list', function () {
                 return \App\Tag::all();
@@ -23,7 +31,6 @@ class AppServiceProvider extends ServiceProvider
             $view->with(compact('allTags', 'currentUser'));
         });
 
-        \Carbon\Carbon::setLocale(app()->getLocale());
 
     }
 

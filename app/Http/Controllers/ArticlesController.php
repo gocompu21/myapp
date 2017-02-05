@@ -42,10 +42,7 @@ class ArticlesController extends Controller
         return $this->respondCollection($articles);
     }
 
-    protected function respondCollection(\Illuminate\Contracts\Pagination\LengthAwarePaginator $articles)
-    {
-        return view('articles.index', compact('articles'));
-    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -160,6 +157,11 @@ class ArticlesController extends Controller
         );
 
         return redirect(route('articles.show', $article->id));
+    }
+
+    protected function respondCollection(\Illuminate\Contracts\Pagination\LengthAwarePaginator $articles)
+    {
+        return view('articles.index', compact('articles'));
     }
 
     /**

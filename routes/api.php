@@ -35,17 +35,17 @@ Route::group([
                 'uses' => 'ArticlesController@tags',
             ]);
 
-//            // 첨부 파일
+            // 첨부 파일
 //            Route::resource('attachments', 'AttachmentsController', ['only' => ['store', 'destroy']]);
-//
-//            // 아티클별 첨부 파일
-//            Route::resource('articles.attachments', 'AttachmentsController', ['only' => ['index']]);
-//
-//            // 댓글
-//            Route::resource('comments', 'CommentsController', ['only' => ['show', 'update', 'destroy']]);
-//
-//            // 아티클별 댓글
-//            Route::resource('articles.comments', 'CommentsController', ['only' => ['index', 'store']]);
+
+            // 아티클별 첨부 파일
+            Route::resource('articles.attachments', 'AttachmentsController', ['only' => ['index']]);
+
+            // 댓글
+            Route::resource('comments', 'CommentsController', ['only' => ['show', 'update', 'destroy']]);
+
+            // 아티클별 댓글
+            Route::resource('articles.comments', 'CommentsController', ['only' => ['index', 'store']]);
 //
 //            // 투표
 //            Route::post('comments/{comment}/votes', [

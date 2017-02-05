@@ -170,7 +170,7 @@ return [
         Laracasts\Flash\FlashServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
-
+        Appkr\Api\ApiServiceProvider::class,
         /*
          * Application Service Providers...
          */
