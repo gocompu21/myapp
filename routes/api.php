@@ -5,12 +5,14 @@ Route::group([
     'namespace' => 'Api',
     'as' => 'api.',
     ], function () {
+
     /* api.v1 */
     Route::group([
         'prefix' => 'v1',
         'namespace' => 'v1',
         'as' => 'v1.',
         ], function () {
+
             /* 환영 메시지 */
             Route::get('/', [
                 'as' => 'index',
@@ -50,5 +52,35 @@ Route::group([
 //                'as' => 'comments.vote',
 //                'uses' => 'CommentsController@vote',
 //        ]);
+
     });
+
+    /* 회원가입 */
+    Route::post('auth/register', [
+        'as' => 'users.store',
+        'uses' => 'UsersController@store',
+    ]);
+
+    /**
+     * 토큰 요청 및 리프레시
+     *
+     * 사용자가 확인되면 서버는 클라이언트에게 토큰을 반환한다.
+     * 클라이언트는 토큰을 기억해야 한다.
+     * 클라이언트는 리소스를 요청할 때 Authorization 헤더에 토큰을 달아서 보낸다.
+     *
+     * API 서비스는 세션을 유지하지 않기 때문에, 로그아웃이 필요없다.
+     * 모든 API 요청은 Authorization 헤더값을 제시해야 하고,
+     * 서버는 그 헤더값으로 사용자를 식별하여 인증/권한부여한다.
+     */
+    Route::post('auth/login', [
+        'as' => 'sessions.store',
+        'uses' => 'SessionsController@store',
+    ]);
+
+    Route::post('auth/refresh', [
+        'middleware' => 'jwt.refresh',
+        'as' => 'sessions.refresh',
+        function () {
+        },
+    ]);
 });
