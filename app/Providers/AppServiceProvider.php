@@ -22,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with(compact('allTags', 'currentUser'));
         });
+
+        \Carbon\Carbon::setLocale(app()->getLocale());
+
     }
 
     /**

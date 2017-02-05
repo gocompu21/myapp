@@ -35,12 +35,17 @@ class ArticlesController extends Controller
             $query = $query->whereRaw($raw, [$keyword]);
         }
 
-//        $articles = $query->paginate(3);
+    //    $articles = $query->paginate(3);
         $articles = $this->cache($cacheKey, 5, $query, 'paginate', 3);
 
-        return view('articles.index', compact('articles'));
+//        return view('articles.index', compact('articles'));
+        return $this->respondCollection($articles);
     }
 
+    protected function respondCollection(\Illuminate\Contracts\Pagination\LengthAwarePaginator $articles)
+    {
+        return view('articles.index', compact('articles'));
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -65,7 +70,8 @@ class ArticlesController extends Controller
             'notification' => $request->has('notification'),
         ]);
 
-        $article = $request->user()->articles()->create($payload);
+        //$article = $request->user()->articles()->create($payload);
+        $article = \App\User::find(1)->articles()->create($payload);
 
         if (! $article) {
             flash()->error('작성하신 글을 저장하지 못했습니다.');
@@ -78,9 +84,8 @@ class ArticlesController extends Controller
         event(new \App\Events\ArticlesEvent($article));
         event(new \App\Events\ModelChanged(['articles']));
 
-        flash()->success('작성하신 글이 저장되었습니다.');
+        return $this->respondCreated($article);
 
-        return redirect(route('articles.index'));
     }
 
     /**
@@ -101,8 +106,10 @@ class ArticlesController extends Controller
             ->whereNull('parent_id')
             ->latest()->get();
 
-        return view('articles.show',compact('article','comments'));
+        return $this->respondInstance($article, $comments);
+ //       return view('articles.show', compact('article', 'comments'));
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -129,8 +136,8 @@ class ArticlesController extends Controller
         $article->update($request->all());
         $article->tags()->sync($request->input('tags'));
 
-        flash()->success('수정하신 내용을 저장했습니다.');
-        return redirect(route('articles.show', $article->id));
+        //return redirect(route('articles.show', $article->id));
+        return $this->respondUpdated($article);
     }
 
     /**
@@ -145,4 +152,34 @@ class ArticlesController extends Controller
         $article->delete();
         return response()->json([], 204);
     }
+
+    protected function respondCreated($article)
+    {
+        flash()->success(
+            trans('forum.articles.success_writing')
+        );
+
+        return redirect(route('articles.show', $article->id));
+    }
+
+    /**
+     * @param \App\Article $article
+     * @param \Illuminate\Database\Eloquent\Collection $comments
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    protected function respondInstance(\App\Article $article, \Illuminate\Database\Eloquent\Collection $comments)
+    {
+        return view('articles.show', compact('article', 'comments'));
+    }
+
+    /**
+     * @param \App\Article $article
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    protected function respondUpdated(\App\Article $article)
+    {
+        flash()->success(trans('forum.articles.success_updating'));
+        return redirect(route('articles.show', $article->id));
+    }
+
 }
