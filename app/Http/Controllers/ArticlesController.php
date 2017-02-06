@@ -5,11 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\ArticlesRequest;
 
-class ArticlesController extends Controller
+class ArticlesController extends Controller implements \App\Http\Controllers\Cacheable
 {
     public function __construct()
     {
+//        parent::__construct();
         $this->middleware('auth',['except' =>['index','show']]);
+    }
+
+    /**
+     * Specify the tags for caching.
+     *
+     * @return string
+     */
+    public function cacheTags()
+    {
+        return 'articles';
     }
 
     /**
@@ -94,8 +105,11 @@ class ArticlesController extends Controller
     public function show(\App\Article $article)
     {
 //        $article = \App\Article::findOrFail($id);
-        $article->view_count += 1;
-        $article->save();
+        if(! is_api_domain())
+        {
+            $article->view_count += 1;
+            $article->save();
+        }
 
         $comments = $article->comments()
             ->with('replies')

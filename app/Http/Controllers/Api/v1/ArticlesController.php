@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Article;
+use App\EtagTrait;
 use App\Http\Controllers\ArticlesController as ParentController;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class ArticlesController extends ParentController
 {
+    use EtagTrait;
+
     public function __construct()
     {
         parent::__construct();
@@ -45,11 +48,23 @@ class ArticlesController extends ParentController
      * @param LengthAwarePaginator $articles
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondCollection(LengthAwarePaginator $articles)
+    protected function respondCollection(LengthAwarePaginator $articles, $cacheKey = null)
     {
+        $reqEtag = request()->getETags();
+        $genEtag = $this->etags($articles, $cacheKey);
+
+        if (config('project.etag') and isset($reqEtag[0]) and $reqEtag[0] === $genEtag) {
+            return json()->notModified();
+        }
+
+        return json()->setHeaders(['Etag' => $genEtag])->withPagination(
+            $articles,
+            new \App\Transformers\ArticleTransformer
+        );
+
         //return $articles->toJson(JSON_PRETTY_PRINT);
         //return (new \App\Transformers\ArticleTransformerBasic)->withPagination($articles);
-        return json()->withPagination($articles, new \App\Transformers\ArticleTransformer());
+        //return json()->withPagination($articles, new \App\Transformers\ArticleTransformer());
     }
 
     /**
@@ -59,9 +74,22 @@ class ArticlesController extends ParentController
      */
     protected function respondInstance(\App\Article $article, \Illuminate\Database\Eloquent\Collection $comments)
     {
+        $cacheKey = cache_key('articles.'.$article->id);
+        $reqEtag = request()->getETags();
+        $genEtag = $this->etag($article, $cacheKey);
+
+        if (config('project.etag') and isset($reqEtag[0]) and $reqEtag[0] === $genEtag) {
+            return json()->notModified();
+        }
+
+        return json()->setHeaders(['Etag' => $genEtag])->withItem(
+            $article,
+            new \App\Transformers\ArticleTransformer
+        );
+
         // return $article->toJson(JSON_PRETTY_PRINT);
         // return (new \App\Transformers\ArticleTransformerBasic)->withItem($article);
-        return json()->withItem($article, new \App\Transformers\ArticleTransformer());
+        // return json()->withItem($article, new \App\Transformers\ArticleTransformer());
     }
 
     /**
